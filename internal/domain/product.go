@@ -24,11 +24,7 @@ import (
 //	New         bool    `json:"new"`
 //	Top         bool    `json:"top"`
 //}
-
-func GetProducts(ctx context.Context) (resultJson string, err error) {
-	db := GetDB()
-	defer func() { _ = db.Close() }()
-	rows, err := db.QueryContext(ctx, `
+const query = `
 select json_build_object(
                'id', cat.id,
                'name', cat.name,
@@ -59,7 +55,13 @@ group by cat.id;
 
 select cat.id, cat.name, cat.translit_name
 from app_category cat
-`)
+`
+
+func GetProducts(ctx context.Context) (resultJson string, err error) {
+	db := GetDB()
+	defer func() { _ = db.Close() }()
+	rows, err := db.QueryContext(ctx, query)
+
 	if err != nil {
 		return
 	}
